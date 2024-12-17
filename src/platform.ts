@@ -30,7 +30,7 @@ export class PhilipsAirPlusPlatform implements DynamicPlatformPlugin {
     this.Service = api.hap.Service;
     this.Characteristic = api.hap.Characteristic;
 
-    this.log.info(JSON.stringify(config));
+    this.log.debug('Config:',JSON.stringify(config));
 
     this.log.debug('Finished initializing platform:', this.config.name);
 
