@@ -9,7 +9,7 @@
   "homepage": "https://github.com/agmv/homebridge-philipsairplus-platform#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agmv/homebridge-philipsairplus-platform.git"
+    "url": "git+https://github.com/agmv/homebridge-philipsairplus-platform.git"
   },
   "bugs": {
     "url": "https://github.com/agmv/homebridge-philipsairplus-platform/issues"

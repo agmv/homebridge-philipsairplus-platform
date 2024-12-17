@@ -22,7 +22,7 @@ This is a plugin for Philips Air+ Smart Tower Heaters.
 After [Homebridge](https://github.com/homebridge/homebridge) has been installed:
 
 ```
-sudo npm install -g --unsafe-perm homebridge-philipsair-platform@latest
+sudo npm install -g --unsafe-perm homebridge-philipsairplus-platform@latest
 ```
 
 The plugin uses a library based on `python3`. To use the plugin, Python/Pip must be installed!
