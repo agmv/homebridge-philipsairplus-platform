@@ -1,8 +1,10 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "PhilipsAirPlusPlatform",
   "pluginType": "platform",
   "singular": true,
   "strictValidation": false,
+  "headerDisplay": "Homebridge Plugin for Philips Air+ Smart Heater",
+  "footerDisplay": "The plugin uses a library (phipsair) based on python3. So these requirements need to be installed first.",
   "schema": {
     "type": "object",
     "properties": {
@@ -10,8 +12,108 @@
         "title": "Name",
         "type": "string",
         "required": true,
-        "default": "Example Dynamic Platform"
+        "default": "PhilipsAirPlusPlatform",
+        "description": "Name for the log."
+      },
+      "debug": {
+        "title": "Debug Log",
+        "type": "boolean",
+        "description": "Enables additional output (debug) in the log."
+      },
+      "devices": {
+        "title": "Devices",
+        "type": "array",
+        "required": true,
+        "minLength": 1,
+        "items": {
+          "title": "Device",
+          "type": "object",
+          "properties": {
+            "active": {
+              "title": "Active",
+              "type": "boolean",
+              "description": "If enabled, the device will be exposed to HomeKit."
+            },            
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": true,
+              "description": "Device display name",
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              }
+            },"deviceId": {
+              "title": "Device Id",
+              "type": "string",
+              "required": true,
+              "description": "Device unique id",
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              }
+            },
+            "type": {
+              "name": "Type",
+              "type": "string",
+              "required": true,
+              "enum": [
+                "heater"
+              ],
+              "default": "heater",
+              "description": "Set the type of device.",
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              }
+            },
+            "ip_address": {
+              "title": "IP Address",
+              "type": "string",
+              "required": true,
+              "format": "ipv4",
+              "placeholder": "10.0.1.16",
+              "description": "IP address of your device.",
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              }
+            },
+            "port": {
+              "title": "Port",
+              "type": "integer",
+              "placeholder": 5683,
+              "description": "Port of your device.",
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              }
+            }
+          }
+        }
       }
     }
-  }
+  },
+  "layout": [
+    "name",
+    "debug",
+    {
+      "title": "Devices",
+      "expandable": true,
+      "expanded": true,
+      "orderable": false,
+      "type": "section",
+      "items": [
+        {
+          "key": "devices",
+          "type": "array",
+          "orderable": false,
+          "buttonText": "Add Device",
+          "items": [
+            "devices[].active",
+            "devices[].deviceId",
+            "devices[].name",
+            "devices[].type",
+            "devices[].ip_address",
+            "devices[].port"
+          ]
+        }
+      ]
+    }
+  ]
 }
