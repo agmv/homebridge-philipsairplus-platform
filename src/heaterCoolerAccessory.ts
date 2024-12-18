@@ -78,7 +78,7 @@ export class HeaterCoolerAccessory extends AirControlHandler {
       try {
         const args = [...this.args];
         args.push('set', `D0320F=${(value as number * 17920)}`,'-I');
-        this.obj.setActive(value as number);
+        this.obj.setSwingMode(value as number);
         this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.SwingMode, value);        
         await this.sendCommand(args, undefined, 60);
       } catch (error) {
@@ -101,11 +101,11 @@ export class HeaterCoolerAccessory extends AirControlHandler {
       try {
         const args = [...this.args];
         args.push('set', `D03105=${value}`,'-I');
-        this.obj.setActive(value as number);
+        this.obj.setLightStatus(value as number);
         this.lightService.updateCharacteristic(this.platform.Characteristic.On, value);        
         await this.sendCommand(args, undefined, 60);
       } catch (error) {
-        this.platform.log.warn('An error occured during changing on state!', this.accessory.displayName);
+        this.platform.log.warn('An error occured during changing light state!', this.accessory.displayName);
         this.handleError(error);
       }
     } else {
@@ -124,11 +124,11 @@ export class HeaterCoolerAccessory extends AirControlHandler {
       try {
         const args = [...this.args];
         args.push('set', `D03130=${(value as number > 0)?100:0}`,'-I');
-        this.obj.setActive(value as number);
+        this.obj.setBeepStatus(value as number);
         this.beepService.updateCharacteristic(this.platform.Characteristic.On, value);        
         await this.sendCommand(args, undefined, 60);
       } catch (error) {
-        this.platform.log.warn('An error occured during changing on state!', this.accessory.displayName);
+        this.platform.log.warn('An error occured during changing beep state!', this.accessory.displayName);
         this.handleError(error);
       }
     } else {
@@ -141,17 +141,17 @@ export class HeaterCoolerAccessory extends AirControlHandler {
    * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
    */
   async setAutoPlusAI(value: CharacteristicValue) {    
-    if (this.beepService && this.obj) {
+    if (this.autoPlusAIService && this.obj) {
       this.platform.log.debug(`Set Auto+ AI: ${value}`, this.accessory.displayName);
     
       try {
         const args = [...this.args];
         args.push('set', `D03180=${value}`,'-I');
-        this.obj.setActive(value as number);
-        this.beepService.updateCharacteristic(this.platform.Characteristic.On, value);        
+        this.obj.setAutoPlusAIStatus(value as number);
+        this.autoPlusAIService.updateCharacteristic(this.platform.Characteristic.On, value);        
         await this.sendCommand(args, undefined, 60);
       } catch (error) {
-        this.platform.log.warn('An error occured during changing on state!', this.accessory.displayName);
+        this.platform.log.warn('An error occured during changing Auto+ AI state!', this.accessory.displayName);
         this.handleError(error);
       }
     } else {
@@ -160,10 +160,30 @@ export class HeaterCoolerAccessory extends AirControlHandler {
   }
 
 
+  /**
+   * Handle "SET" requests from HomeKit
+   * These are sent when the user changes the state of an accessory, for example, turning on a Light bulb.
+   */
+  async setTemperatureUnits(value: CharacteristicValue) {
+    if (this.heaterCoolerService && this.obj) {
+      this.platform.log.debug(`Set Temperature Unit: ${value}`, this.accessory.displayName);
+    
+      try {
+        this.obj.setTemperatureUnit(value as number);
+        this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, value);        
+      } catch (error) {
+        this.platform.log.warn('An error occured during changing temperature unit!', this.accessory.displayName);
+        this.handleError(error);
+      }
+    } else {
+      this.platform.log.error('Error setting temperature unit. No service or object.');
+    }
+  }
+
   async onSetData(data: string) {
     this.platform.log.debug('onSetData:', data, this.accessory.displayName);
     try {
-      this.obj = new SmartFanHeater(this.platform, data);
+      this.obj = new SmartFanHeater(this.platform, data);      
     
       // set accessory information
       this.accessory.getService(this.platform.Service.AccessoryInformation)!
@@ -177,6 +197,13 @@ export class HeaterCoolerAccessory extends AirControlHandler {
       this.accessory.addService(this.platform.Service.HeaterCooler, this.obj.getName());
 
       const mode = this.obj.getMode();
+      const tempCharacteristic = this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits) ||
+        this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, 
+          this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
+
+      this.obj.setTemperatureUnit(tempCharacteristic.value || this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
+      tempCharacteristic
+        .onSet(this.setTemperatureUnits.bind(this));
 
       // Required Characteristics
       // each service must implement at-minimum the "required characteristics" for the given service type

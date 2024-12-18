@@ -13,6 +13,11 @@ export enum Swing {
     on = 17920
   }
 
+export enum TemperatureUnit {
+  CELSIUS = 0,
+  FAHRENHEIT = 1
+}
+
 export class SmartFanHeater {
   private D01102: number = 0;
   private Name: string = ''; //name
@@ -55,6 +60,7 @@ export class SmartFanHeater {
   private AutoPlusAI: number = 1; // Auto+ AI
   private D03182: number = 2;
   private D03R81: string = '';
+  private TemperatureUnit: TemperatureUnit = TemperatureUnit.CELSIUS;
   
     
   constructor (
@@ -121,7 +127,12 @@ export class SmartFanHeater {
   }
   
   getTargetTemperature() : number {
-    return this.TargetTemperature;
+    if (this.TemperatureUnit === TemperatureUnit.CELSIUS) {
+      return this.TargetTemperature;
+    } else {
+      //°F = °C × (9/5) + 32
+      return this.TargetTemperature * (9/5) + 32;
+    }
   }
   
   getDeviceId() : string {
@@ -133,7 +144,12 @@ export class SmartFanHeater {
   }
   
   getCurrentTemp() : number {
-    return this.CurrentTemperature/10;
+    if (this.TemperatureUnit === TemperatureUnit.CELSIUS) {
+      return this.CurrentTemperature/10;
+    } else {
+      //°F = °C × (9/5) + 32
+      return this.CurrentTemperature/10 * (9/5) + 32;
+    }
   }
   
   getActive() : boolean {
@@ -182,5 +198,13 @@ export class SmartFanHeater {
 
   getMode() : Mode {
     return this.Mode;
+  }
+
+  setTemperatureUnit(value: CharacteristicValue) {
+    this.TemperatureUnit = value as TemperatureUnit;    
+  }
+
+  getTemperatureUnit() {
+    return this.TemperatureUnit;
   }
 }
