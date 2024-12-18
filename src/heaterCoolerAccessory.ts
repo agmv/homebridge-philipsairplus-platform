@@ -195,7 +195,7 @@ export class HeaterCoolerAccessory extends AirControlHandler {
           this.platform.Characteristic.CurrentHeaterCoolerState.HEATING);
         this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState, 
           this.platform.Characteristic.TargetHeaterCoolerState.AUTO);
-            
+        this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.obj.getTargetTemperature());
         break;
       case Mode.ventilation:
         this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.CurrentHeaterCoolerState,
@@ -217,13 +217,12 @@ export class HeaterCoolerAccessory extends AirControlHandler {
 
       this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.Name, this.obj.getName());
 
-      // Target temperature is only available if mode is Auto
-      if (mode === Mode.auto) {
-        this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.obj.getTargetTemperature());
-      }
+      this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, 
+        this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
       
       this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.SwingMode, 
-        this.obj.getSwingMode() === Swing.on ? this.platform.Characteristic.SwingMode.SWING_ENABLED : this.platform.Characteristic.SwingMode.SWING_DISABLED);
+        this.obj.getSwingMode() === Swing.on ? this.platform.Characteristic.SwingMode.SWING_ENABLED : 
+          this.platform.Characteristic.SwingMode.SWING_DISABLED);
 
       // register handlers for the SwingMode Characteristic
       this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.SwingMode)
@@ -305,6 +304,7 @@ export class HeaterCoolerAccessory extends AirControlHandler {
         this.accessory.addService(this.platform.Service.HeaterCooler);
     
       const mode = this.obj.getMode();
+      const c = this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature);      
       
       // Required Characteristics
       this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.Active, 
@@ -316,19 +316,30 @@ export class HeaterCoolerAccessory extends AirControlHandler {
           this.platform.Characteristic.CurrentHeaterCoolerState.HEATING);
         this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState, 
           this.platform.Characteristic.TargetHeaterCoolerState.AUTO);
-                
+        // Threshold is optional and only set if Mode is Auto
+        if (c) {
+          this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.obj.getTargetTemperature());
+        } else {
+          this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.obj.getTargetTemperature());
+        }      
         break;
       case Mode.ventilation:
         this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.CurrentHeaterCoolerState,
           this.platform.Characteristic.CurrentHeaterCoolerState.IDLE);
         this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState, 
           this.platform.Characteristic.TargetHeaterCoolerState.COOL);
+        if (c) {
+          this.heaterCoolerService.removeCharacteristic(c);
+        }
         break;
       default:
         this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.CurrentHeaterCoolerState,
           this.platform.Characteristic.CurrentHeaterCoolerState.HEATING);
         this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState, 
           this.platform.Characteristic.TargetHeaterCoolerState.HEAT);
+        if (c) {
+          this.heaterCoolerService.removeCharacteristic(c);
+        }
         break;
       }
 
@@ -338,19 +349,8 @@ export class HeaterCoolerAccessory extends AirControlHandler {
       this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.Name, this.obj.getName());
       
       this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.SwingMode, 
-        this.obj.getSwingMode() === Swing.on ? this.platform.Characteristic.SwingMode.SWING_ENABLED : this.platform.Characteristic.SwingMode.SWING_DISABLED);
-
-      // Threshold is optional and only set if Mode is Auto
-      const c = this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature);       
-      if (this.obj.getMode() === Mode.auto) {
-        if (c) {
-          this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.obj.getTargetTemperature());
-        } else {
-          this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.obj.getTargetTemperature());
-        }
-      } else {
-        this.heaterCoolerService.removeCharacteristic(c);
-      }     
+        this.obj.getSwingMode() === Swing.on ? this.platform.Characteristic.SwingMode.SWING_ENABLED : 
+          this.platform.Characteristic.SwingMode.SWING_DISABLED);            
 
       // Light and buttons     
       this.lightService = this.accessory.getService(this.platform.Service.Lightbulb) ||

@@ -13,8 +13,6 @@ export enum Swing {
     on = 17920
   }
 
-  
-
 export class SmartFanHeater {
   private D01102: number = 0;
   private Name: string = ''; //name
@@ -93,10 +91,10 @@ export class SmartFanHeater {
       this.LightBulb = data.D03105;
       this.D03106 = data.D03106;
       this.D0310A = data.D0310A;
-      this.Mode = Mode[data.D0310C as keyof typeof Mode];
+      this.Mode = data.D0310C as Mode;
       this.D0310D = data.D0310D;
       this.TargetTemperature = data.D0310E;
-      this.SwingMode = Swing[data.D0320F as keyof typeof Swing];
+      this.SwingMode = data.D0320F as Swing;
       this.D03110 = data.D03110;
       this.CurrentTemperature = data.D03224;
       this.Beep = data.D03130;
