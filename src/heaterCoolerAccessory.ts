@@ -30,7 +30,7 @@ export class HeaterCoolerAccessory extends AirControlHandler {
     if (typeof error === 'string') {
       this.platform.log.error(error, this.accessory.displayName);
     } else if (error instanceof Error) {
-      this.platform.log.error((error as Error).message, this.accessory.displayName);
+      this.platform.log.error((error as Error).message, (error as Error).stack, this.accessory.displayName);
     } else {
       this.platform.log.error('Error with unknown type:', error, this.accessory.displayName);
     }

@@ -23,10 +23,7 @@
       "devices": {
         "title": "Devices",
         "type": "array",
-        "required": true,
-        "minLength": 1,
         "items": {
-          "title": "Device",
           "type": "object",
           "properties": {
             "active": {
@@ -90,20 +87,25 @@
     }
   },
   "layout": [
-    "name",
-    "debug",
     {
+      "title": "Configuration",
+      "type": "fieldset",
+      "items": [
+        "name",
+        "debug"
+      ]      
+    },
+    {
+      "key": "devices",
       "title": "Devices",
       "expandable": true,
       "expanded": true,
       "orderable": false,
-      "type": "section",
+      "add": "Add Device",
+      "type": "array",
       "items": [
         {
-          "key": "devices",
-          "type": "array",
-          "orderable": false,
-          "buttonText": "Add Device",
+          "type": "fieldset",
           "items": [
             "devices[].active",
             "devices[].deviceId",
