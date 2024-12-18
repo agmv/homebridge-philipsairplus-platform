@@ -170,7 +170,13 @@ export class HeaterCoolerAccessory extends AirControlHandler {
     
       try {
         this.obj.setTemperatureUnit(value as number);
-        this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, value);        
+        this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, value);
+        this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.obj.getCurrentTemp());
+        const c = this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature);
+        if (c) {
+          this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, 
+            this.obj.getTargetTemperature());
+        }
       } catch (error) {
         this.platform.log.warn('An error occured during changing temperature unit!', this.accessory.displayName);
         this.handleError(error);
@@ -331,7 +337,11 @@ export class HeaterCoolerAccessory extends AirControlHandler {
         this.accessory.addService(this.platform.Service.HeaterCooler);
     
       const mode = this.obj.getMode();
-      const c = this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature);      
+      const c = this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature);
+      const tempCharacteristic = this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits) ||
+        this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, 
+          this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
+      this.obj.setTemperatureUnit(tempCharacteristic.value || this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
       
       // Required Characteristics
       this.heaterCoolerService.updateCharacteristic(this.platform.Characteristic.Active, 

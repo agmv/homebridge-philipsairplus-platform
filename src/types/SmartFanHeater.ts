@@ -50,11 +50,11 @@ export class SmartFanHeater {
   private D0310D: number = 1;
   private TargetTemperature: number = 23; // target temperature
   private SwingMode: Swing = Swing.off; // swing mode
-  private D03110: number = 0;
+  private D03110: number = 0; // Timer
   private CurrentTemperature: number = 210; // current temperature
   private Beep: number = 0; // Beep
   private D0313F: number = 65;
-  private D03240: number = 0;
+  private D03240: number = 0; // On/Off
   private D03450: number = 1;
   private D03451: number = 0;
   private AutoPlusAI: number = 1; // Auto+ AI
