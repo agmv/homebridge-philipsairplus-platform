@@ -62,6 +62,7 @@ export class SmartFanHeater {
   private D03R81: string = '';
   private TemperatureUnit: TemperatureUnit = TemperatureUnit.CELSIUS;
   
+  public readonly SwingModeSetValue = 17222;
     
   constructor (
       public readonly platform: PhilipsAirPlusPlatform,
@@ -106,12 +107,58 @@ export class SmartFanHeater {
       this.Beep = data.D03130;
       this.D0313F = data.D0313F;
       this.D03240 = data.D03240;
-      this.D03450 = data.D03450;
+      this.D03450 = data.D03450; // Eco?
       this.D03451 = data.D03451;
       this.AutoPlusAI = data.D03180;
       this.D03182 = data.D03182;
       this.D03R81 = data.D03R81;
     }
+  }
+
+  updateObj(json: string) {
+    const data = JSON.parse(json);
+    this.D01102 = data.D01102;
+    this.Name = data.D01S03;
+    this.D01S04 = data.D01S04;
+    this.Model = data.D01S05;
+    this.D01107 = data.D01107;
+    this.D01108 = data.D01108;
+    this.D01109 = data.D01109;
+    this.D0110A = data.D0110A;
+    this.D0110B = data.D0110B;
+    this.D0110C = data.D0110C;
+    this.D0110F = data.D0110F;
+    this.FirmwareRevision = data.D01S12;
+    this.TargetTemperature = data.D0310E;
+    this.D01213 = data.D01213;
+    this.ProductId = data.ProductId;
+    this.DeviceId = data.DeviceId;
+    this.MCUBoot = data.MCUBoot;
+    this.Runtime = data.Runtime;
+    this.rssi = data.rssi;
+    this.wifilog = data.wifilog;
+    this.free_memory = data.free_memory;
+    this.WifiVersion = data.WifiVersion;
+    this.StatusType = data.StatusType;
+    this.ConnectType = data.ConnectType;
+    this.Active = data.D03102;
+    this.LightBulb = data.D03105;
+    this.D03106 = data.D03106;
+    this.D0310A = data.D0310A;
+    this.Mode = data.D0310C as Mode;
+    this.D0310D = data.D0310D;
+    this.TargetTemperature = data.D0310E;
+    this.SwingMode = data.D0320F as Swing;
+    this.D03110 = data.D03110;
+    this.CurrentTemperature = data.D03224;
+    this.Beep = data.D03130;
+    this.D0313F = data.D0313F;
+    this.D03240 = data.D03240;
+    this.D03450 = data.D03450; // Eco?
+    this.D03451 = data.D03451;
+    this.AutoPlusAI = data.D03180;
+    this.D03182 = data.D03182;
+    this.D03R81 = data.D03R81;
   }
     
   getName() : string {

@@ -6,14 +6,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 
-export class AirControlHandler {
+export abstract class AirControlHandler {
   manufacturer: string = 'Philips';
   serialNumber: string = '0000';
   private ipAddress: IPv4Address;
   private port: number;
   args: Array<string>;
   private airControl: ChildProcess | undefined;
-  //private processTimeout!: NodeJS.Timeout;
   private shutdown: boolean = false;
 
   constructor(
@@ -28,6 +27,7 @@ export class AirControlHandler {
   
     this.args = [
       'python3',
+      '-u',
       `${path.resolve(__dirname, '../')}/lib/pyaircontrol.py`,
       '-H',
       this.ipAddress,
@@ -41,15 +41,14 @@ export class AirControlHandler {
     });
   }
 
-  async onData(data: string) {
-    this.platform.log.debug('onData:', JSON.stringify(data), this.accessory.displayName);
-  };
+  abstract onData(data: string) : Promise<void>;
+  abstract onCmdData(data: string) : Promise<void>;
 
-  async onError(err: object) {
-    this.platform.log.error(err.toString(), this.accessory.displayName);
+  async onError(err: Error) {
+    this.platform.log.error(err.message, err.stack, this.accessory.displayName);
   }
 
-  sendCommand(args: unknown[], callback?: (data: string) => void, timeoutInSec?: number) {
+  sendCommand(args: unknown[], timeoutInSec?: number) {
     this.platform.log.debug(`CMD: ${args.join(' ')}`, this.accessory.displayName);
     return new Promise<void>((resolve, reject) => {
       exec(args.join(' '), (timeoutInSec) ? { timeout: timeoutInSec*60*1000 }: {}, (err, stdout, stderr) => {
@@ -58,10 +57,8 @@ export class AirControlHandler {
           return reject(err);
         }
         if (stdout) {
-          this.platform.log.debug('CMD response:', JSON.stringify(stdout), this.accessory.displayName);
-        }
-        if (callback) {
-          callback(stdout);
+          this.platform.log.debug('CMD response:', stdout.toString(), this.accessory.displayName);
+          this.onCmdData(stdout);
         }
         resolve();
       });
@@ -74,7 +71,7 @@ export class AirControlHandler {
 
     this.platform.log.debug('Starting poll:', args.join(' '), this.accessory.displayName);
 
-    this.airControl = spawn(args.shift() as string, args, { stdio: ['ignore','pipe','inherit'] });
+    this.airControl = spawn(args.shift() as string, args, { stdio: ['ignore','pipe','pipe'] });
 
     if (this.airControl) {
 
@@ -83,26 +80,17 @@ export class AirControlHandler {
       this.airControl.stderr?.on('data', this.onError.bind(this));
 
       this.airControl.stderr?.on('exit', () => {
-        this.platform.log.debug(
-          `airControl process killed (${this.shutdown ? 'expected' : 'not expected'})`,
-          this.accessory.displayName,
-        );
-
-        /*clearTimeout(this.processTimeout);
-
-        if (!this.shutdown) {
-          this.platform.log.debug('Restarting polling process', this.accessory.displayName);
-        }*/
+        if (this.shutdown) {
+          this.platform.log.debug('airControl process killed (expected)', this.accessory.displayName);
+        } else {
+          this.platform.log.error('airControl process killed (not expected)', this.accessory.displayName);
+        }        
       });
 
-      /*this.processTimeout = setTimeout(() => {
-        this.platform.log.debug('Timeout!', this.airControl?.pid);
-        if (this.airControl) {
-          this.airControl.kill();
-          this.airControl = undefined;
-        }
-        this.longPoll();
-      }, 5 * 60 * 1000);*/
+      this.airControl.on('error', this.onError.bind(this));
+
+    } else {
+      this.platform.log.error('Failed to spawn process');
     }
   }
 
