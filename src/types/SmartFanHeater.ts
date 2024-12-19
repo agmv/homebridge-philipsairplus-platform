@@ -173,13 +173,15 @@ export class SmartFanHeater {
     return this.FirmwareRevision;
   }
   
-  getTargetTemperature() : number {
-    if (this.TemperatureUnit === TemperatureUnit.CELSIUS) {
+  getTargetTemperature() : number {    
+    return this.TargetTemperature;
+    // Homekit uses Celsius internally
+    /*if (this.TemperatureUnit === TemperatureUnit.CELSIUS) {
       return this.TargetTemperature;
     } else {
       //°F = °C × (9/5) + 32
       return this.TargetTemperature * (9/5) + 32;
-    }
+    }*/
   }
   
   getDeviceId() : string {
@@ -191,12 +193,16 @@ export class SmartFanHeater {
   }
   
   getCurrentTemp() : number {
+    return this.CurrentTemperature;
+    // Homekit uses Celsius internally
+    /*
     if (this.TemperatureUnit === TemperatureUnit.CELSIUS) {
       return this.CurrentTemperature/10;
     } else {
       //°F = °C × (9/5) + 32
       return this.CurrentTemperature/10 * (9/5) + 32;
     }
+    */
   }
   
   getActive() : boolean {
