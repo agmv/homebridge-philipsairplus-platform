@@ -193,7 +193,7 @@ export class SmartFanHeater {
   }
   
   getCurrentTemp() : number {
-    return this.CurrentTemperature;
+    return this.CurrentTemperature/10;
     // Homekit uses Celsius internally
     /*
     if (this.TemperatureUnit === TemperatureUnit.CELSIUS) {
