@@ -2,5 +2,5 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.12] - 2024-12-27
+## [1.0.13] - 2024-12-27
 - Moved debug configuration to the device configuration to support debug per device

@@ -9,8 +9,9 @@ import { fileURLToPath } from 'url';
 export abstract class AirControlHandler {
   manufacturer: string = 'Philips';
   serialNumber: string = '0000';
-  private ipAddress: IPv4Address;
-  private port: number;
+  ipAddress: IPv4Address;
+  port: number;
+  debug: boolean = false;
   args: Array<string>;
   private airControl: ChildProcess | undefined;
   private shutdown: boolean = false;
@@ -22,6 +23,7 @@ export abstract class AirControlHandler {
     this.ipAddress = accessory.context.device.ip_address;
     this.port = accessory.context.device.port || 5683;
     this.serialNumber = accessory.context.device.serialNumber || '0000';
+    this.debug = accessory.context.device.debug || false;
     const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
     const __dirname = path.dirname(__filename); // get the name of the directory
   
@@ -33,7 +35,7 @@ export abstract class AirControlHandler {
       this.ipAddress,
       '-P',
       this.port.toString(),
-      accessory.context.device.debug ? '-D' : '',      
+      this.debug ? '-D' : '',
     ].filter((cmd) => cmd);   
     
     this.platform.api.on('shutdown', () => {
