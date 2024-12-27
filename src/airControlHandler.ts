@@ -46,8 +46,14 @@ export abstract class AirControlHandler {
   abstract onData(data: string) : Promise<void>;
   abstract onCmdData(data: string) : Promise<void>;
 
-  async onError(err: Error) {
-    this.platform.log.error(err.message, err.stack, this.accessory.displayName);
+  async onError(error: unknown) {
+    if (typeof error === 'string') {
+      this.platform.log.error('onError():', error, this.accessory.displayName);
+    } else if (error instanceof Error) {
+      this.platform.log.error('onError():', (error as Error).message, (error as Error).stack, this.accessory.displayName);
+    } else {
+      this.platform.log.error('onError(): Error with unknown type.\n', JSON.stringify(error), this.accessory.displayName);
+    }
   }
 
   sendCommand(args: unknown[], timeoutInSec?: number) {
@@ -55,7 +61,7 @@ export abstract class AirControlHandler {
     return new Promise<void>((resolve, reject) => {
       exec(args.join(' '), (timeoutInSec) ? { timeout: timeoutInSec*60*1000 }: {}, (err, stdout, stderr) => {
         if (err) {
-          this.platform.log.error(stderr, this.accessory.displayName);
+          this.platform.log.error('CMD error:', stderr, this.accessory.displayName);
           return reject(err);
         }
         if (stdout) {
@@ -92,7 +98,7 @@ export abstract class AirControlHandler {
       this.airControl.on('error', this.onError.bind(this));
 
     } else {
-      this.platform.log.error('Failed to spawn process');
+      this.platform.log.error('Failed to spawn process', this.accessory.displayName);
     }
   }
 
