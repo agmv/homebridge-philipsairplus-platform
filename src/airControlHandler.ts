@@ -46,14 +46,13 @@ export abstract class AirControlHandler {
   abstract onData(data: string) : Promise<void>;
   abstract onCmdData(data: string) : Promise<void>;
 
-  async onError(error: unknown) {
-    if (typeof error === 'string') {
-      this.platform.log.error('onError():', error, this.accessory.displayName);
-    } else if (error instanceof Error) {
-      this.platform.log.error('onError():', (error as Error).message, (error as Error).stack, this.accessory.displayName);
-    } else {
-      this.platform.log.error('onError(): Error with unknown type.', JSON.stringify(error), this.accessory.displayName);
-    }
+  async onStdErrData(error: string) {
+    error = error.toString();
+    this.platform.log.error('onStdErrData():', error, this.accessory.displayName);    
+  }
+
+  async onError(error: Error) {
+    this.platform.log.error('onError():', error.message, error.stack, this.accessory.displayName);    
   }
 
   sendCommand(args: unknown[], timeoutInSec?: number) {
@@ -85,7 +84,7 @@ export abstract class AirControlHandler {
 
       this.airControl.stdout?.on('data', this.onData.bind(this));
 
-      this.airControl.stderr?.on('data', this.onError.bind(this));
+      this.airControl.stderr?.on('data', this.onStdErrData.bind(this));
 
       this.airControl.stderr?.on('exit', () => {
         if (this.shutdown) {
