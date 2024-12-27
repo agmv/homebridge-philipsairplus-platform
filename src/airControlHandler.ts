@@ -47,7 +47,7 @@ export abstract class AirControlHandler {
   abstract onCmdData(data: string) : Promise<void>;
 
   async onStdErrData(error: string) {
-    error = error.toString();
+    error = error.toString().replace(/\n$/, '');
     this.platform.log.debug('onStdErrData():', error, this.accessory.displayName);    
   }
 
