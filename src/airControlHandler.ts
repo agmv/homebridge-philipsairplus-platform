@@ -52,7 +52,7 @@ export abstract class AirControlHandler {
     } else if (error instanceof Error) {
       this.platform.log.error('onError():', (error as Error).message, (error as Error).stack, this.accessory.displayName);
     } else {
-      this.platform.log.error('onError(): Error with unknown type.\n', JSON.stringify(error), this.accessory.displayName);
+      this.platform.log.error('onError(): Error with unknown type.', JSON.stringify(error), this.accessory.displayName);
     }
   }
 
