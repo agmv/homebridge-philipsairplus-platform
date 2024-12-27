@@ -30,9 +30,9 @@ export class PhilipsAirPlusPlatform implements DynamicPlatformPlugin {
     this.Service = api.hap.Service;
     this.Characteristic = api.hap.Characteristic;
 
-    this.log.debug('Config:',JSON.stringify(config));
+    log.debug('Config:',JSON.stringify(config));
 
-    this.log.debug('Finished initializing platform:', this.config.name);
+    log.debug('Finished initializing platform:', this.config.name);
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,

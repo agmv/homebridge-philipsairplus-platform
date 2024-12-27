@@ -33,7 +33,7 @@ export abstract class AirControlHandler {
       this.ipAddress,
       '-P',
       this.port.toString(),
-      this.platform.config.debug ? '-D' : '',      
+      accessory.context.device.debug ? '-D' : '',      
     ].filter((cmd) => cmd);   
     
     this.platform.api.on('shutdown', () => {

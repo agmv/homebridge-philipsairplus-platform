@@ -15,11 +15,6 @@
         "default": "PhilipsAirPlusPlatform",
         "description": "Name for the log."
       },
-      "debug": {
-        "title": "Debug Log",
-        "type": "boolean",
-        "description": "Enables additional output (debug) in the log."
-      },
       "devices": {
         "title": "Devices",
         "type": "array",
@@ -30,7 +25,12 @@
               "title": "Active",
               "type": "boolean",
               "description": "If enabled, the device will be exposed to HomeKit."
-            },            
+            },
+            "debug": {
+              "title": "Debug",
+              "type": "boolean",
+              "description": "Enables additional output (debug) in the log."
+            },                  
             "name": {
               "title": "Name",
               "type": "string",

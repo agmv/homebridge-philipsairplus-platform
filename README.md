@@ -53,10 +53,10 @@ phipsair -H <ip-address> status -J
         {
             "platform": "PhilipsAirPlusPlatform",
             "name": "PhilipsAirPlusPlatform",
-            "debug": false,
             "devices": [
                 {
                     "active": true,
+                    "debug": false,
                     "name": "Heater",
                     "deviceId": "4c9c6904ca0f11afb5691bcd86317a2a",
                     "type": "heater",
@@ -74,9 +74,9 @@ phipsair -H <ip-address> status -J
 |------------------|--------------------------------------------------------------|----------------------------|----------|
 | **platform**     | Must always be `PhilipsAirPlusPlatform`.                     | `"PhilipsAirPlusPlatform"` | Yes      |
 | **name**         | For logging purposes                                         | `"PhilipsAirPlusPlatform"` | Yes      |
-| debug            | Enables additional output (debug) in the log.                | `false`                    | No       |
 | devices          | Array of Philips air purifiers.                              |                            | Yes      |
 |- active          | Whether the device is active and should be used              |                            | Yes      |
+|- debug           | Enables additional output (debug) in the log.                | `false`                    | No       |
 |- name            | Unique name of your device.                                  |                            | Yes      |
 |- **deviceId**    | Device unique identifier                                     |                            | Yes      |
 |- type            | Unique name of your device.                                  | Must be `heater` for now   | Yes      |
