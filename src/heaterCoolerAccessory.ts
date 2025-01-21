@@ -246,9 +246,6 @@ export class HeaterCoolerAccessory extends AirControlHandler {
       // Optional Characteristics
 
       this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.Name, this.obj.getName());
-
-      this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, 
-        this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS);
       
       this.heaterCoolerService.setCharacteristic(this.platform.Characteristic.SwingMode, 
         this.obj.getSwingMode() === Swing.on ? this.platform.Characteristic.SwingMode.SWING_ENABLED : 
