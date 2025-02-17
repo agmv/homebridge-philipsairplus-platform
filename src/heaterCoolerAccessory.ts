@@ -40,7 +40,7 @@ export class HeaterCoolerAccessory extends AirControlHandler {
     try {     
       const args = [...this.args];
       args.push('status', '-J');
-      await this.sendCommand(args, 60);
+      await this.sendCommand(args, 60, true);      
     } catch (error) {
       this.handleError(error,'initAccessory():');
     }
@@ -182,9 +182,9 @@ export class HeaterCoolerAccessory extends AirControlHandler {
     }
   }
 
-  async onCmdData(data: string) {
+  async onCmdData(data: string, startPoll: boolean) {
     data = data.toString().replace(/\n$/, '');
-    this.platform.log.debug('onSetData:', data, this.accessory.displayName);
+    this.platform.log.debug('onCmdData:', data, this.accessory.displayName);
     try {
       this.obj = new SmartFanHeater(this.platform, data);      
     
@@ -305,9 +305,12 @@ export class HeaterCoolerAccessory extends AirControlHandler {
       this.autoPlusAIService.setCharacteristic(this.platform.Characteristic.Name, 'Auto Plus AI');
 
       // Start Polling
-      this.longPoll();
+      if (startPoll) {
+        this.longPoll();
+      }
+    
     } catch(error) {
-      this.handleError(error, 'onSetData(...):');
+      this.handleError(error, 'onCmdData(...):');
     }
   }
 
@@ -335,6 +338,8 @@ export class HeaterCoolerAccessory extends AirControlHandler {
       // set accessory information
       this.accessory.getService(this.platform.Service.AccessoryInformation)!
         .updateCharacteristic(this.platform.Characteristic.FirmwareRevision, this.obj.getFirmware());
+
+
     
       const mode = this.obj.getMode();
       const c = this.heaterCoolerService.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature);

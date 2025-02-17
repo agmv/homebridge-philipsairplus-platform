@@ -44,7 +44,7 @@ export abstract class AirControlHandler {
   }
 
   abstract onData(data: string) : Promise<void>;
-  abstract onCmdData(data: string) : Promise<void>;
+  abstract onCmdData(data: string, startPoll: boolean) : Promise<void>;
 
   async onStdErrData(error: string) {
     error = error.toString().replace(/\n$/, '');
@@ -55,7 +55,7 @@ export abstract class AirControlHandler {
     this.platform.log.error('onError():', error.message, error.stack, this.accessory.displayName);    
   }
 
-  sendCommand(args: unknown[], timeoutInSec?: number) {
+  sendCommand(args: unknown[], timeoutInSec?: number, startPoll: boolean = false) {
     this.platform.log.debug(`CMD: ${args.join(' ')}`, this.accessory.displayName);
     return new Promise<void>((resolve, reject) => {
       exec(args.join(' '), (timeoutInSec) ? { timeout: timeoutInSec*60*1000 }: {}, (err, stdout, stderr) => {
@@ -65,7 +65,7 @@ export abstract class AirControlHandler {
         }
         if (stdout) {
           this.platform.log.debug('CMD response:', stdout.toString(), this.accessory.displayName);
-          this.onCmdData(stdout);
+          this.onCmdData(stdout, startPoll);
         }
         resolve();
       });
@@ -76,7 +76,8 @@ export abstract class AirControlHandler {
     const args = [...this.args];
     args.push('status-observe', '-J');
 
-    this.platform.log.debug('Starting poll:', args.join(' '), this.accessory.displayName);
+    this.platform.log.info('Starting poll:', this.accessory.displayName);
+    this.platform.log.debug('Poll command:', args.join(' '), this.accessory.displayName);
 
     this.airControl = spawn(args.shift() as string, args, { stdio: ['ignore','pipe','pipe'] });
 

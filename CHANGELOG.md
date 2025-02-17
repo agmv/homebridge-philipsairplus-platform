@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.23] - 2025-02-17
+- Updated dependencies
+- Fixed poll mechanism
+
 ## [1.0.22] - 2025-02-03
 - Updated dependencies
 
