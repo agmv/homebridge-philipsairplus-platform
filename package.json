@@ -34,7 +34,7 @@
     "watch": "npm run build && npm link && nodemon"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@types/eslint__js": "^9.14.0",
     "@types/node": "^24.10.13",
     "eslint": "^9.39.2",
