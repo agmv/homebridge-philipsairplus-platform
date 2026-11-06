@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+- deviceId auto-detection: log stderr, stdout, exit code and timeout when `phipsair` fails
+- deviceId auto-detection: retry up to 3 times before giving up
+- Fall back to the cached deviceId (same IP) instead of removing the accessory from HomeKit when auto-detection fails
+- Rename the "Auto+" switch to "Auto Plus" (the old name was rejected by HAP-NodeJS); the old service is removed automatically
+- Exclude `.claude` local settings from the npm package
+
 ## [2.1.0] - 2026-02-16
 - Update dependencies
 - Merge [PR#119](https://github.com/agmv/homebridge-philipsairplus-platform/pull/119) from [Jeko](https://github.com/LeJeko) 

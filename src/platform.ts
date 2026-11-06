@@ -102,7 +102,20 @@ export class PhilipsAirPlusPlatform implements DynamicPlatformPlugin {
 
       return null;
     } catch (error) {
-      this.log.error(`Failed to fetch device info from ${ipAddress}:`, (error as Error).message);
+      const err = error as Error & { stderr?: string; stdout?: string; code?: number | string; killed?: boolean };
+      this.log.error(`Failed to fetch device info from ${ipAddress}:`, err.message);
+      if (err.killed) {
+        this.log.error('phipsair timed out after 30s (no answer from the device on UDP port ' + port + ')');
+      }
+      if (err.code !== undefined) {
+        this.log.error(`phipsair exit code: ${err.code}`);
+      }
+      if (err.stderr?.trim()) {
+        this.log.error(`phipsair stderr: ${err.stderr.trim()}`);
+      }
+      if (err.stdout?.trim()) {
+        this.log.error(`phipsair stdout: ${err.stdout.trim()}`);
+      }
       return null;
     }
   }
@@ -137,12 +150,34 @@ export class PhilipsAirPlusPlatform implements DynamicPlatformPlugin {
       let deviceId = device.deviceId;
       if (!deviceId && device.ip_address) {
         this.log.info(`No deviceId provided for ${device.name}, attempting auto-detection...`);
-        const info = await this.fetchDeviceInfo(device.ip_address, device.port || 5683);
+        let info = null;
+        for (let attempt = 1; attempt <= 3 && !info; attempt++) {
+          if (attempt > 1) {
+            this.log.warn(`Retrying auto-detection for ${device.name} (attempt ${attempt}/3)...`);
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+          }
+          info = await this.fetchDeviceInfo(device.ip_address, device.port || 5683);
+        }
+
         if (info) {
           deviceId = info.deviceId;
           device.deviceId = deviceId; // Store for future use
           this.log.info(`Auto-detected deviceId: ${deviceId}`);
         } else {
+          // Fall back to the deviceId of a cached accessory with the same IP, so a temporary
+          // failure does not make the accessory disappear from HomeKit.
+          for (const cached of this.accessories.values()) {
+            const cachedDevice = cached.context.device;
+            if (cachedDevice?.deviceId && cachedDevice.ip_address === device.ip_address) {
+              deviceId = cachedDevice.deviceId;
+              device.deviceId = deviceId;
+              this.log.warn(`Auto-detection failed for ${device.name}, using cached deviceId: ${deviceId}`);
+              break;
+            }
+          }
+        }
+
+        if (!deviceId) {
           this.log.error(`Failed to auto-detect deviceId for ${device.name}. Please check the IP address or provide deviceId manually.`);
           continue;
         }

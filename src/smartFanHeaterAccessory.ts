@@ -140,12 +140,15 @@ export class SmartFanHeaterAccessory extends AirControlHandler {
 
     // Auto+ AI switch
     // Remove old service if exists with old name
-    const oldAutoPlusService = this.accessory.getService('Auto Plus AI');
-    if (oldAutoPlusService) {
-      this.accessory.removeService(oldAutoPlusService);
+    // ('Auto+' is also invalid for HAP: a name must end with a letter or number)
+    for (const oldName of ['Auto Plus AI', 'Auto+']) {
+      const oldAutoPlusService = this.accessory.getService(oldName);
+      if (oldAutoPlusService) {
+        this.accessory.removeService(oldAutoPlusService);
+      }
     }
-    this.autoPlusAIService = this.accessory.getService('Auto+') ||
-      this.accessory.addService(this.platform.Service.Switch, 'Auto+', 'AUTO_PLUS_AI');
+    this.autoPlusAIService = this.accessory.getService('Auto Plus') ||
+      this.accessory.addService(this.platform.Service.Switch, 'Auto Plus', 'AUTO_PLUS_AI');
 
     this.autoPlusAIService.setCharacteristic(this.platform.Characteristic.On, false);
     this.autoPlusAIService.getCharacteristic(this.platform.Characteristic.On)

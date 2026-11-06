@@ -147,7 +147,7 @@ HomeKit displays switches with generic names ("Switch", "Switch 2", etc.). Here 
 |----------------|-------------|------------------------------------------|
 | Switch 1       | Oscillation | Enables/disables the swing rotation      |
 | Switch 2       | Beep        | Enables/disables the button sounds       |
-| Switch 3       | Auto+       | Enables/disables the Auto+ AI mode       |
+| Switch 3       | Auto Plus   | Enables/disables the Auto+ AI mode       |
 | Backlight      | Backlight   | Controls the display backlight (CX5120 only) |
 
 > **Tip:** You can rename these switches in the Home app by long-pressing the accessory and selecting "Accessory Settings".
